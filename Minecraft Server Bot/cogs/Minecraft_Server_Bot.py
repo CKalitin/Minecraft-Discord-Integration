@@ -12,7 +12,7 @@ import time
 channel = 832688833375109151
 
 # Path to text file with data
-file_path = '../'
+file_path = 'Minecraft Server Bot/'
 
 # The embed that the bot created
 embed = embeds.Embed(
@@ -96,7 +96,7 @@ class MinecraftServerBot(commands.Cog):
         global players
 
         # Open server_data.txt file
-        with open(f'server_data.txt') as csv_file:
+        with open(f'{file_path}server_data.txt') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',') # Get data in CSV format
             line_count = 0 # index of for loop
 
