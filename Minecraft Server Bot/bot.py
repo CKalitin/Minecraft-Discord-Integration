@@ -40,15 +40,11 @@ async def ping(ctx):
     print(f'{round(client.latency * 1000)}ms')
 
 
-@client.command()
-async def kill(ctx):
-    await ctx.send(f'Eventually I\'ll be the one Killing you')
-    sys.exit()
-
 for filename in os.listdir(f"{discord_bot_path}/cogs"):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
         print(f'Loaded: cogs.{filename[:-3]}')
 
-f = open(f"{discord_bot_path}/Token", "r")
-client.run(f.read())
+token_file = open(f"{discord_bot_path}/Token", "r")
+client.run(token_file.read())
+token_file.close()

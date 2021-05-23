@@ -25,7 +25,7 @@ embed_message = None
 update_time = 3
 
 # Server vars
-server_name = ""
+server_name = "CEJA Server"
 max_players = 0
 players_online = 0
 players = []
@@ -90,7 +90,6 @@ class MinecraftServerBot(commands.Cog):
 
     # Read data from file
     async def update_data(self):
-        global server_name
         global max_players
         global players_online
         global players
@@ -103,10 +102,8 @@ class MinecraftServerBot(commands.Cog):
             # Loop through all rows in CSV
             for row in csv_reader:
                 if line_count == 0:
-                    server_name = row[0]
-                elif line_count == 1:
                     max_players = int(row[0])
-                elif line_count == 2:
+                elif line_count == 1:
                     players = row
                     players_online = len(players)
                 
