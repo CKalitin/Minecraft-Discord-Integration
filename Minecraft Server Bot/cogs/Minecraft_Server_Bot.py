@@ -9,10 +9,10 @@ import csv
 import time
 
 # Channel ID in discord to write to
-channel = 832688833375109151
+channel = 846165990622494750
 
 # Path to text file with data
-file_path = 'Minecraft Server Bot/'
+file_path = '../'
 
 # The embed that the bot created
 embed = embeds.Embed(
@@ -38,7 +38,13 @@ class MinecraftServerBot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print("Ready: Server Text")
+
         await self.setup_embed()
+
+        await self.get_starting_data()
+        await self.update_data()
+        await self.update_embed()
+
         await self.update()
 
 
@@ -83,31 +89,35 @@ class MinecraftServerBot(commands.Cog):
         description = description[:-2]
 
         embed.description = description
-        embed.title = server_name
 
         await embed_message.edit(embed=embed)
 
 
     # Read data from file
     async def update_data(self):
-        global max_players
         global players_online
         global players
 
         # Open server_data.txt file
         with open(f'{file_path}server_data.txt') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',') # Get data in CSV format
-            line_count = 0 # index of for loop
+            csv_reader = list(csv.reader(csv_file, delimiter=',')) # Get data in CSV format
+            if len(csv_reader) > 0:
+                players = csv_reader[0] # Get players online
+                players_online = len(players) - 1 # Get num players online
+            else:
+                players = [] # Set players to 0
+                players_online = 0 # Set num players online
 
-            # Loop through all rows in CSV
-            for row in csv_reader:
-                if line_count == 0:
-                    max_players = int(row[0])
-                elif line_count == 1:
-                    players = row
-                    players_online = len(players)
-                
-                line_count += 1
+    
+    # Get data that doesn't change (Max Players)
+    async def get_starting_data(self):
+        global max_players
+
+        # Open server_data.txt file
+        with open(f'{file_path}server.properties') as csv_file:
+            csv_reader = list(csv.reader(csv_file, delimiter=',')) # Get data in CSV format
+            if len(csv_reader) > 0:
+                max_players = int(csv_reader[24][0][12:]) # Get max players from server.properties and convert to int
 
 
 
