@@ -6,13 +6,11 @@ from discord import colour
 import asyncio
 import csv
 
-import time
-
 # Channel ID in discord to write to
 channel = 846165990622494750
 
 # Path to text file with data
-file_path = '../'
+file_path = ''
 
 # The embed that the bot created
 embed = embeds.Embed(
@@ -30,14 +28,14 @@ max_players = 0
 players_online = 0
 players = []
 
-class MinecraftServerBot(commands.Cog):
+class ServerInfo(commands.Cog):
     def __init__(self, client):
         self.client = client
 
     # When bot is ready print "Ready" and call starting functions
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Ready: Server Text")
+        print("Ready: Server Info")
 
         await self.setup_embed()
 
@@ -50,12 +48,10 @@ class MinecraftServerBot(commands.Cog):
 
     # Update is called every (update_time) and it reads new dat and updates the embed
     async def update(self):
-        await self.update_embed()
-
-        await asyncio.sleep(update_time)
-
-        await self.update_data()
-        await self.update()
+        while True:
+            await asyncio.sleep(update_time)
+            await self.update_embed()
+            await self.update_data()
 
 
     # Send embed with starting text
@@ -86,7 +82,7 @@ class MinecraftServerBot(commands.Cog):
         """
         for player in players:
             description += f"{player}, "
-        description = description[:-2]
+        description = description[:-5]
 
         embed.description = description
 
@@ -122,4 +118,4 @@ class MinecraftServerBot(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(MinecraftServerBot(client))
+    client.add_cog(ServerInfo(client))
