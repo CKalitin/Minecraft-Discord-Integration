@@ -7,7 +7,7 @@ import asyncio
 import csv
 
 # Channel ID in discord to write to
-channel = 846165990622494750
+channel_id = 710214024587116704
 
 # Path to text file with data
 file_path = ''
@@ -20,7 +20,7 @@ embed = embeds.Embed(
 # The message that has the embed
 embed_message = None
 # Seconds between data updates
-update_time = 3
+loop_time = 3
 
 # Server vars
 server_name = "CEJA Server"
@@ -40,18 +40,16 @@ class ServerInfo(commands.Cog):
         await self.setup_embed()
 
         await self.get_starting_data()
-        await self.update_data()
-        await self.update_embed()
 
-        await self.update()
+        await self.loop()
 
 
     # Update is called every (update_time) and it reads new dat and updates the embed
-    async def update(self):
+    async def loop(self):
         while True:
-            await asyncio.sleep(update_time)
             await self.update_embed()
             await self.update_data()
+            await asyncio.sleep(loop_time)
 
 
     # Send embed with starting text
@@ -60,7 +58,7 @@ class ServerInfo(commands.Cog):
         global embed_message
 
         embed.set_thumbnail(
-            url="https://pbs.twimg.com/profile_images/1169125587157340160/qtOBELUS_400x400.jpg"
+            url="https://hypixel.net/attachments/crafty_logo_shadowfixed_small-png.1035865/"
         )
 
         #embed.set_author(name="CEJA Server Bot")
@@ -69,7 +67,7 @@ class ServerInfo(commands.Cog):
             text=f"Developed by CaptnCAK."
         )
 
-        embed_message = await self.client.get_channel(channel).send(embed=embed)
+        embed_message = await self.client.get_channel(channel_id).send(embed=embed)
 
 
 
@@ -109,7 +107,7 @@ class ServerInfo(commands.Cog):
     async def get_starting_data(self):
         global max_players
 
-        # Open server_data.txt file
+        # Open server.properties file
         with open(f'{file_path}server.properties') as csv_file:
             csv_reader = list(csv.reader(csv_file, delimiter=',')) # Get data in CSV format
             if len(csv_reader) > 0:
