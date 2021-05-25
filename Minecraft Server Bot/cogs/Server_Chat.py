@@ -7,13 +7,13 @@ import asyncio
 import csv
 
 # Channel ID in discord to write to
-channel_id = 710214024587116704
+channel_id = 846165990622494750
 
 # Path to text file with data
 file_path = ''
 
 # Seconds between loops
-loop_time = 3
+loop_time = 2
 
 class ServerChat(commands.Cog):
     def __init__(self, client):
@@ -38,17 +38,17 @@ class ServerChat(commands.Cog):
         if message.channel.id == channel_id and message.author.id != self.client.user.id:
             # Open discord_chat_data.txt file to append to
             with open(f'{file_path}discord_chat_data.txt', "a") as f:
-                f.write(f"{message.author.name}, {message.content}\n")
+                f.write(f"{message.author.name}: {message.content}\n")
 
     
     async def read_minecraft_chat_data(self):
         # Open minecraft_chat_data.txt file
         with open(f'{file_path}minecraft_chat_data.txt') as csv_file:
-            csv_reader = list(csv.reader(csv_file, delimiter='¦')) # Get data in CSV format
+            csv_reader = list(csv.reader(csv_file, delimiter='¦')) # Get data in CSV format (CSV isn't great for this because people use comma's, had to change to obscure delimiter character)
             
             if len(csv_reader) > 0: # If file contains data
                 for row in csv_reader: # Loop though the rows
-                    await self.client.get_channel(channel_id).send(f"{row[0][:-1]}: {row[1]}") # Send message in current row
+                    await self.client.get_channel(channel_id).send(f"{row[0][:-1]}:{row[1]}") # Send message in current row
 
         # Delete contents of file
         with open(f'{file_path}minecraft_chat_data.txt', "w") as f:

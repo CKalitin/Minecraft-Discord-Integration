@@ -6,7 +6,7 @@ import os
 client = discord.Client()
 client = commands.Bot(command_prefix='-')
 
-discord_bot_path = "Minecraft Server Bot"
+discord_bot_path = "Minecraft Server Bot/"
 
 
 @client.event
@@ -40,11 +40,11 @@ async def ping(ctx):
     print(f'{round(client.latency * 1000)}ms')
 
 
-for filename in os.listdir(f"{discord_bot_path}/cogs"):
+for filename in os.listdir(f"{discord_bot_path}cogs"):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
         print(f'Loaded: cogs.{filename[:-3]}')
 
-token_file = open(f"{discord_bot_path}/Token", "r")
+token_file = open(f"{discord_bot_path}Token", "r")
 client.run(token_file.read())
 token_file.close()

@@ -7,7 +7,7 @@ import asyncio
 import csv
 
 # Channel ID in discord to write to
-channel_id = 710214024587116704
+channel_id = 846165990622494750
 
 # Path to text file with data
 file_path = ''

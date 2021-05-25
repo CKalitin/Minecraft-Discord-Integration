@@ -1,8 +1,13 @@
 package com.CaptnCAK.discordintegration;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -20,23 +25,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.sql.ConnectionEvent;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("discordintegration")
 public class DiscordIntegration
 {
-    int millisBetweenDataUpdate = 2000;
-
-    long timerStartTime = 0;
-
-    List<PlayerEntity> players = new ArrayList<PlayerEntity>();
-    List<String> playerNames = new ArrayList<String>();
+    static List<PlayerEntity> players = new ArrayList<PlayerEntity>();
+    static List<String> playerNames = new ArrayList<String>();
 
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
@@ -44,12 +45,6 @@ public class DiscordIntegration
     public DiscordIntegration() {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        // Register the enqueueIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-        // Register the processIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
-        // Register the doClientStuff method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -62,88 +57,86 @@ public class DiscordIntegration
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
     }
 
-    private void doClientStuff(final FMLClientSetupEvent event) {
-        // do something that can only be done on the client
-        LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().options);
-    }
-
-    private void enqueueIMC(final InterModEnqueueEvent event)
-    {
-        // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("examplemod", "helloworld", () -> { LOGGER.info("Hello world from the MDK"); return "Hello world";});
-    }
-
-    private void processIMC(final InterModProcessEvent event)
-    {
-        // some example code to receive and process InterModComms from other mods
-        LOGGER.info("Got IMC {}", event.getIMCStream().
-                map(m->m.getMessageSupplier().get()).
-                collect(Collectors.toList()));
-    }
-
-    /*private void Loop() {
-        if (System.currentTimeMillis() - timerStartTime >= millisBetweenDataUpdate){
-            timerStartTime = System.currentTimeMillis();
-            LOGGER.info("current dir = " + System.getProperty("user.dir"));
-        }
-        Loop();
-    }*/
-
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
-        LOGGER.info("HELLO from server starting");
-        timerStartTime = System.currentTimeMillis();
 
-        //Loop();
+        Timer timer = new Timer(); // Create new Timer
+        timer.schedule(new Loop(), 0, 1000); // Get Timer to call run in Loop class every second
     }
 
     @SubscribeEvent
     public void onChatEvent(ServerChatEvent event) {
-        LOGGER.info(event.getPlayer() + " " + event.getUsername() + " " + event.getMessage());
+        try {
+            PrintWriter pw = new PrintWriter("minecraft_chat_data.txt"); // Open file minecraft_chat_data.txt
+            pw.println(event.getUsername() + "¦ " + event.getMessage()); // Write username and message to bottom of file
+            pw.close(); // Close file
+        } catch (IOException e) {
+            System.out.println("Could not write to minecraft_chat_data.txt");
+            e.printStackTrace();
+        }
     }
 
     @SubscribeEvent
     public void onPlayerConnectEvent(PlayerEvent.PlayerLoggedInEvent event){
-        players.add(event.getPlayer());
-        playerNames.add(event.getPlayer().getDisplayName().getString());
-        LOGGER.info(event.getPlayer().getDisplayName().getString());
-        UpdateServerData();
+        players.add(event.getPlayer()); // Add PlayerEntity to List of PlayerEntity's
+        playerNames.add(event.getPlayer().getDisplayName().getString()); // Add player names to list of player names
+        UpdateServerData(); // call Update server_data.txt function
     }
 
     @SubscribeEvent
     public void onPlayerDisconnectEvent(PlayerEvent.PlayerLoggedOutEvent event){
-        players.remove(event.getPlayer());
-        playerNames.remove(event.getPlayer().getDisplayName().getString());
-        UpdateServerData();
+        players.remove(event.getPlayer()); // Remove PlayerEntity to List of PlayerEntity's
+        playerNames.remove(event.getPlayer().getDisplayName().getString()); // Remove player names to list of player names
+        UpdateServerData(); // call Update server_data.txt function
     }
 
     private void UpdateServerData() {
+        // Nothing here is a true CSV, just writing text similar to a CSV
         try {
-            PrintWriter pw = new PrintWriter("server_data.txt");
-            pw.close();
+            PrintWriter pw = new PrintWriter("server_data.txt"); // Open server_data.txt and Clear all text from it
+            pw.close(); // Close file
 
-            FileWriter fw = new FileWriter("server_data.txt");
-            for (int i = 0; i < playerNames.size(); i++){
-                fw.write(playerNames.get(i) + ", ");
+            FileWriter fw = new FileWriter("server_data.txt"); // Open server_data.txt
+            for (int i = 0; i < playerNames.size(); i++){ // Loop through player names
+                fw.write(playerNames.get(i) + ", "); // Write player name to server_data.txt
             }
-            fw.close();
-            System.out.println("Successfully wrote to the file.");
+            fw.close(); // Close server_data.txt
         } catch (IOException e) {
             System.out.println("Could not write to server_data.txt");
             e.printStackTrace();
         }
     }
 
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
-    @Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
+    public static List<PlayerEntity> GetPlayers(){
+        return players;
+    }
+
+    // Class is needed for timer in onServerStarting
+    public class Loop extends TimerTask {
+        // This function will be called every x seconds
+        public void run(){
+            try {
+                List<PlayerEntity> localPlayers = DiscordIntegration.GetPlayers(); // Because this is a new class you need to get the players for the parent class
+                try (BufferedReader br = new BufferedReader(new FileReader("discord_chat_data.txt"))) { // Open discord_chat_data.txt in try catch block in case of error
+                    String line; // Current line of discord_chat_data.txt
+                    while ((line = br.readLine()) != null) { // Loop through all lines
+                        if (localPlayers.size() > 0){ // Check length of players to prevent error in for loop
+                            for (int i = 0; i < localPlayers.size(); i++){ // Loop through players
+                                PlayerEntity player = localPlayers.get(i); // Get current player
+                                player.sendMessage(new StringTextComponent(line), player.getUUID()); // Create ITextComponent and Send message to current player
+                                LOGGER.info(line); // Send message to console
+                            }
+                        }
+                    }
+                }
+                PrintWriter pw = new PrintWriter("discord_chat_data.txt"); // Open discord_chat_data.txt and Clear all text from it
+                pw.close(); // Close file
+            } catch (IOException e){
+                System.out.println("Could not read discord_chat_data.txt");
+                e.printStackTrace();
+            }
         }
     }
 }
