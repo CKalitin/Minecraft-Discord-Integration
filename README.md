@@ -4,7 +4,7 @@ Get info such as online players, max players, etc. directly into your discord se
 Discord bot setup:
 1. Drag the Minecraft Server Bot into your Minecraft Server folder.
 2. VS Code Instructions: Open the minecraft server folder with VS Code and launch bot.py
-2. Other VS Code Instructions (Not nessecery if you did the other instructions, this is just for quality of life): Change discord_bot_path in bot.py to "Minecraft Server Bot", and file_path in Server_Info.py and Server_Chat.py to "../" and open only the Minecraft Server Bot folder to launch the bot.
+2. Other VS Code Instructions (Not nessecery if you did the other instructions, this is just for quality of life): Change discord_bot_path in bot.py to "Minecraft Server Bot/", and file_path in Server_Info.py and Server_Chat.py to "../" and open only the Minecraft Server Bot folder to launch the bot.
 
 Mod Setup:
 1. Make sure your minecraft server has Forge.
