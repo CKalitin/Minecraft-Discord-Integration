@@ -39,7 +39,7 @@ class ServerChat(commands.Cog):
             # Open discord_chat_data.txt file to append to
             with open(f'{file_path}discord_chat_data.txt', "a") as f:
                 f.write(f"{message.author.name}: {message.content}\n")
-                print(f"Discord: {message.author.name}: {message.content}\n")
+                print(f"Discord: {message.author.name}: {message.content}")
 
     
     async def read_minecraft_chat_data(self):
