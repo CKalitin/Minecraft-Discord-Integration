@@ -39,6 +39,7 @@ class ServerChat(commands.Cog):
             # Open discord_chat_data.txt file to append to
             with open(f'{file_path}discord_chat_data.txt', "a") as f:
                 f.write(f"{message.author.name}: {message.content}\n")
+                print(f"Discord: {message.author.name}: {message.content}\n")
 
     
     async def read_minecraft_chat_data(self):
@@ -48,7 +49,8 @@ class ServerChat(commands.Cog):
             
             if len(csv_reader) > 0: # If file contains data
                 for row in csv_reader: # Loop though the rows
-                    await self.client.get_channel(channel_id).send(f"{row[0][:-1]}:{row[1]}") # Send message in current row
+                    await self.client.get_channel(channel_id).send(f"{row[0]}:{row[1]}") # Send message in current row
+                    print(f"Minecraft: {row[0]}:{row[1]}")
 
         # Delete contents of file
         with open(f'{file_path}minecraft_chat_data.txt', "w") as f:

@@ -57,17 +57,29 @@ class ServerInfo(commands.Cog):
         global embed
         global embed_message
 
-        embed.set_thumbnail(
-            url="https://hypixel.net/attachments/crafty_logo_shadowfixed_small-png.1035865/"
-        )
+        # Open file 'embed_id.txt' and read it into embed_id variable
+        embed_id_file = open('embed_id.txt', 'r')
+        embed_id = embed_id_file.read()
+        embed_id_file.close()
+    
+        # Try to get existing embed, if it can't be gotten, make a new one
+        try: 
+            embed_message = await self.client.get_channel(channel_id).fetch_message(embed_id)
+            
+            embed.set_thumbnail(url="https://hypixel.net/attachments/crafty_logo_shadowfixed_small-png.1035865/")
 
-        #embed.set_author(name="CEJA Server Bot")
+            embed.set_footer(text=f"Developed by CaptnCAK." )
+        except:
+            embed.set_thumbnail(url="https://hypixel.net/attachments/crafty_logo_shadowfixed_small-png.1035865/")
 
-        embed.set_footer(
-            text=f"Developed by CaptnCAK."
-        )
+            embed.set_footer(text=f"Developed by CaptnCAK.")
 
-        embed_message = await self.client.get_channel(channel_id).send(embed=embed)
+            embed_message = await self.client.get_channel(channel_id).send(embed=embed)
+            
+            # Write embed_id to file
+            embed_id_file = open('embed_id.txt', 'w')
+            embed_id = embed_id_file.write(str(embed_message.id))
+            embed_id_file.close()
 
 
 

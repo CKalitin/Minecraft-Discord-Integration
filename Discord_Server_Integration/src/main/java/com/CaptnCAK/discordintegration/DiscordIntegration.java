@@ -1,46 +1,34 @@
-package com.CaptnCAK.discordintegration;
+package com.captncak.discordintegration;
 
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import com.mojang.logging.LogUtils;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
-import javax.sql.ConnectionEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("discordintegration")
-public class DiscordIntegration
-{
-    static List<PlayerEntity> players = new ArrayList<PlayerEntity>();
+@Mod(DiscordIntegration.MOD_ID)
+public class DiscordIntegration  {
+    public static final String MOD_ID = "discordintegration";
+
+    static List<Player> players = new ArrayList<net.minecraft.world.entity.player.Player>();
     static List<String> playerNames = new ArrayList<String>();
 
-    // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
+    // Directly reference a slf4j logger
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public DiscordIntegration() {
         // Register the setup method for modloading
@@ -50,16 +38,11 @@ public class DiscordIntegration
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void setup(final FMLCommonSetupEvent event)
-    {
+    private void setup(final FMLCommonSetupEvent event) {
         // some preinit code
         LOGGER.info("HELLO FROM PREINIT");
         LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
-    }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
         // do something when the server starts
 
         Timer timer = new Timer(); // Create new Timer
@@ -99,8 +82,8 @@ public class DiscordIntegration
             pw.close(); // Close file
 
             FileWriter fw = new FileWriter("server_data.txt"); // Open server_data.txt
-            for (int i = 0; i < playerNames.size(); i++){ // Loop through player names
-                fw.write(playerNames.get(i) + ", "); // Write player name to server_data.txt
+            for (String playerName : playerNames) { // Loop through player names
+                fw.write(playerName + ", "); // Write player name to server_data.txt
             }
             fw.close(); // Close server_data.txt
         } catch (IOException e) {
@@ -109,24 +92,25 @@ public class DiscordIntegration
         }
     }
 
-    public static List<PlayerEntity> GetPlayers(){
+    public static List<Player> GetPlayers(){
         return players;
     }
 
     // Class is needed for timer in onServerStarting
-    public class Loop extends TimerTask {
+    public static class Loop extends TimerTask {
         // This function will be called every x seconds
         public void run(){
             try {
-                List<PlayerEntity> localPlayers = DiscordIntegration.GetPlayers(); // Because this is a new class you need to get the players for the parent class
+                List<Player> localPlayers = DiscordIntegration.GetPlayers(); // Because this is a new class you need to get the players for the parent class
                 try (BufferedReader br = new BufferedReader(new FileReader("discord_chat_data.txt"))) { // Open discord_chat_data.txt in try catch block in case of error
                     String line; // Current line of discord_chat_data.txt
                     while ((line = br.readLine()) != null) { // Loop through all lines
                         if (localPlayers.size() > 0){ // Check length of players to prevent error in for loop
-                            for (int i = 0; i < localPlayers.size(); i++){ // Loop through players
-                                PlayerEntity player = localPlayers.get(i); // Get current player
-                                player.sendMessage(new StringTextComponent(line), player.getUUID()); // Create ITextComponent and Send message to current player
+                            // Get current player
+                            for (Player player : localPlayers) { // Loop through local players
+                                //player.sendMessage(new StringTextComponent(line), player.getUUID()); // Create ITextComponent and Send message to current player
                                 LOGGER.info(line); // Send message to console
+                                player.sendMessage(Component.nullToEmpty(line), player.getUUID());
                             }
                         }
                     }
