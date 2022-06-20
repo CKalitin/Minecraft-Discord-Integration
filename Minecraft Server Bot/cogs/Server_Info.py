@@ -72,7 +72,7 @@ class ServerInfo(commands.Cog):
         except:
             embed.set_thumbnail(url="https://hypixel.net/attachments/crafty_logo_shadowfixed_small-png.1035865/")
 
-            embed.set_footer(text=f"Developed by CaptnCAK.")
+            embed.set_footer(text=f"https://bit.ly/39Actsf")
 
             embed_message = await self.client.get_channel(channel_id).send(embed=embed)
             

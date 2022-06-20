@@ -40,8 +40,8 @@ public class DiscordIntegration  {
 
     private void setup(final FMLCommonSetupEvent event) {
         // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        //LOGGER.info("HELLO FROM PREINIT");
+        //LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
 
         // do something when the server starts
 
@@ -110,7 +110,9 @@ public class DiscordIntegration  {
                             for (Player player : localPlayers) { // Loop through local players
                                 //player.sendMessage(new StringTextComponent(line), player.getUUID()); // Create ITextComponent and Send message to current player
                                 LOGGER.info(line); // Send message to console
-                                player.sendMessage(Component.nullToEmpty(line), player.getUUID());
+                                //player.displayClientMessage(Component.nullToEmpty(line), false);
+                                player.sendSystemMessage(Component.nullToEmpty(line));
+                                //.sendMessage(Component.nullToEmpty(line), player.getUUID());
                             }
                         }
                     }
