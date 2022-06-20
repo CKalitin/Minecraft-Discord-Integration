@@ -4,14 +4,14 @@ import sys
 import os
 
 client = discord.Client()
-client = commands.Bot(command_prefix='-')
+# Chaning activity is done here instead of in on_ready because someone said on stack overflow to never do it in on_ready and they sounded very convincing
+client = commands.Bot(command_prefix='-', activity = discord.Game('with ur mom'))
 
 discord_bot_path = "Minecraft Server Bot/"
 
 
 @client.event
 async def on_ready():
-    #await client.change_presence(activity=discord.Game(''))
     print("Ready: Bot")
 
 
@@ -31,6 +31,7 @@ async def Unload(ctx, extention):
 async def Reload(ctx, extention):
     client.unload_extension(f'cogs.{extention}')
     client.load_extension(f'cogs.{extention}')
+    
     print(f'Reloaded: cogs.{extention}')
 
 

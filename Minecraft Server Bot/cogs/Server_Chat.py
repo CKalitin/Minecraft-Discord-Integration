@@ -13,7 +13,7 @@ channel_id = 846165990622494750
 file_path = ''
 
 # Seconds between loops
-loop_time = 2
+loop_time = 1
 
 class ServerChat(commands.Cog):
     def __init__(self, client):
@@ -36,10 +36,12 @@ class ServerChat(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id == channel_id and message.author.id != self.client.user.id:
-            # Open discord_chat_data.txt file to append to
-            with open(f'{file_path}discord_chat_data.txt', "a") as f:
-                f.write(f"{message.author.name}: {message.content}\n")
-                print(f"Discord: {message.author.name}: {message.content}")
+            # Check if first character is '-', so if its a command
+            if message.content[0] != '-':
+                # Open discord_chat_data.txt file to append to
+                with open(f'{file_path}discord_chat_data.txt', "a") as f:
+                    f.write(f"{message.author.name}: {message.content}\n")
+                    print(f"(Discord) {message.author.name}: {message.content}")
 
     
     async def read_minecraft_chat_data(self):
@@ -50,7 +52,7 @@ class ServerChat(commands.Cog):
             if len(csv_reader) > 0: # If file contains data
                 for row in csv_reader: # Loop though the rows
                     await self.client.get_channel(channel_id).send(f"**{row[0]}:**{row[1]}") # Send message in current row
-                    print(f"Minecraft: {row[0]}:{row[1]}")
+                    print(f"(Minecraft) {row[0]}:{row[1]}")
 
         # Delete contents of file
         with open(f'{file_path}minecraft_chat_data.txt', "w") as f:
